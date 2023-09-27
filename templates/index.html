@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .title }}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet"
+        id="bootstrap-css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <style type="text/css">
+        .project-tab {
+            padding: 10%;
+            margin-top: -8%;
+        }
+
+        .project-tab #tabs {
+            background: #007b5e;
+            color: #eee;
+        }
+
+        .project-tab #tabs h6.section-title {
+            color: #eee;
+        }
+
+        .project-tab #tabs .nav-tabs .nav-item.show .nav-link,
+        .nav-tabs .nav-link.active {
+            color: #0062cc;
+            background-color: transparent;
+            border-color: transparent transparent #f3f3f3;
+            border-bottom: 3px solid !important;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .project-tab .nav-link {
+            border: 1px solid transparent;
+            border-top-left-radius: .25rem;
+            border-top-right-radius: .25rem;
+            color: #0062cc;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .project-tab .nav-link:hover {
+            border: none;
+        }
+
+        .project-tab thead {
+            background: #f3f3f3;
+            color: #333;
+        }
+
+        .project-tab a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <div class="container"> -->
+    <div class="row">
+        <div class="col-md-12">
+            <br>
+            <div class="row col-md-8" style="float:none;margin:auto;">
+                <form action="/" method="post" class="form-inline" enctype="multipart/form-data">
+                    <div class="form-group mb-2">
+                        <input type="text" class="form-control" name="url" placeholder="Enter url">
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <input type="file" class="form-control" name="wordlist" placeholder="Enter wordlist">
+                    </div>
+                    <button type="submit" class="btn btn-primary mb-2">Add</button>
+                </form>
+            </div>
+
+            <br />
+            <div class="row col-md-12" style="float:none;margin:auto;">
+
+                <table class="table" id="tableFuzzs" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Url</th>
+                            <th>WordlistFile</th>
+                            <th>OutputFile</th>
+                            <th>Ip</th>
+                            <th>WordCount</th>
+                            <th>Started</th>
+                            <th>Ended</th>
+                            <th>Finished</th>
+                            <th>Error</th>
+                            <th>Options</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {{ range .Fuzzs }}
+
+                        {{if .Error}}
+                        <tr class="alert alert-danger">
+                        {{else}}
+                        {{if .Finished}}
+                        <tr class="alert alert-success">
+                        {{else}}
+                        <tr class="alert alert-primary">
+                        {{end}}
+                        {{end}}
+                            <td>{{ .Id }}</td>
+                            <td>{{ .Url }}</td>
+                            <td>{{ .WordlistFile }}</td>
+                            <td>{{ .OutputFile }}</td>
+                            <td>{{ .Ip }}</td>
+                            <td>{{ .WordCount }}</td>
+                            <td>{{ .Started }}</td>
+                            <td>{{ .Ended }}</td>
+                            <td>{{ .Finished }}</td>
+                            <td>{{ .Error }}</td>
+                            <td>
+                                <a href="delete" class="btn btn-primary mb-2" target="_blank"
+                                    rel="noopener noreferrer">Del</a>
+                                {{if .Finished}}
+                                {{ $outputId := (printf "%v%v" "/output/" .Id) }}
+                                <a href={{ $outputId }} class="btn btn-primary mb-2" target="_blank"
+                                    rel="noopener noreferrer">Show</a>
+                                {{end}}
+                            </td>
+                        </tr>
+                        {{ end }}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+    <!-- </div> -->
+
+    <script>
+        $("#nav-listele-tab").click(function () {
+            $.ajax({
+                url: "/getZafigos", // İsteği göndereceğiniz URL'i buraya yazın
+                type: "GET",
+                contentType: "application/json", // Gönderilen veri türünü belirtiyoruz
+                success: function (result) {
+                    console.log(result)
+                    var table = document.getElementById("tableListele")
+                    populateEnvanterTable(table, result)
+                },
+                error: function (data) {
+                    alert("Hata Meydana Geldi:", data);
+                }
+            });
+        });
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+
+</html>
