@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 
 	"go-fuzzer/models"
@@ -43,6 +44,8 @@ var DB_ENGINE = "sqlite3"
 
 var KEY_AUTH_HEADER = "Salahala"
 
+var FLAG_HOSTCNTRL = false
+
 func main() {
 	var err error
 
@@ -68,7 +71,7 @@ func main() {
 }
 
 func index(c *gin.Context) {
-	if c.Request.Header[KEY_AUTH_HEADER] == nil {
+	if FLAG_HOSTCNTRL && c.Request.Header[KEY_AUTH_HEADER] == nil {
 		c.HTML(http.StatusNotFound, "error.html", gin.H{
 			"title":         "go-fuzzer",
 			"status_code":   http.StatusNotFound,
@@ -129,7 +132,7 @@ func returnFuzzTemps(fuzzs []models.Fuzz) ([]FuzzTemplate, error) {
 }
 
 func indexPost(c *gin.Context) {
-	if c.Request.Header[KEY_AUTH_HEADER] == nil {
+	if FLAG_HOSTCNTRL && c.Request.Header[KEY_AUTH_HEADER] == nil {
 		c.HTML(http.StatusNotFound, "error.html", gin.H{
 			"title":         "go-fuzzer",
 			"status_code":   http.StatusNotFound,
@@ -139,6 +142,15 @@ func indexPost(c *gin.Context) {
 	}
 	url := c.PostForm("url")
 	file, _ := c.FormFile("wordlist") //TODO file mevcutsa ve length'i aynıysa indirme?
+
+	if strings.Contains(url, "FUZZ") == false {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"title":         "go-fuzzer",
+			"status_code":   http.StatusInternalServerError,
+			"error_message": "Girdiğin URL parametresinde FUZZ kelimesi yok. Nereye fuzz atacaz :)",
+		})
+		return
+	}
 
 	uploadedFilePath := DIR_WORDLISTS + file.Filename
 	// Upload the file to specific dst.
@@ -234,7 +246,7 @@ func addFuzz(url string, wordlistFile string, ip string) {
 }
 
 func output(c *gin.Context) {
-	if c.Request.Header[KEY_AUTH_HEADER] == nil {
+	if FLAG_HOSTCNTRL && c.Request.Header[KEY_AUTH_HEADER] == nil {
 		c.HTML(http.StatusNotFound, "error.html", gin.H{
 			"title":         "go-fuzzer",
 			"status_code":   http.StatusNotFound,

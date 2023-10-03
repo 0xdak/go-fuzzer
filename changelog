@@ -1,7 +1,12 @@
 features
-    - remove colorization in ffuf command
     - delete feature
     - cancel feature
     - print version in frontend
+    - switch -p command with flag
 
-v.1.0
+v1.1
+    + remove colorization in ffuf command
+    + added flag for host control
+    + check fuzz word in post request parameter
+
+v1.0
