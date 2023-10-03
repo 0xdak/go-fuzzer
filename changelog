@@ -1,0 +1,7 @@
+features
+    - remove colorization in ffuf command
+    - delete feature
+    - cancel feature
+    - print version in frontend
+
+v.1.0
