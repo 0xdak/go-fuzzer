@@ -202,7 +202,7 @@ func addFuzz(url string, wordlistFile string, ip string) {
 		return
 	}
 
-	out, err := exec.Command("ffuf", "-u", url, "-w", wordlistFile, "-p", "1-3", "|", "tee", "").Output()
+	out, err := exec.Command("ffuf", "-u", url, "-w", wordlistFile, "-p", "1-3", "-c").Output()
 	if err != nil {
 		fuzz.Error = 1
 		models.UpdateFuzz(fuzz)
