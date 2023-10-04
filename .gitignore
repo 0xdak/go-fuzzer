@@ -1,4 +1,7 @@
-go-fuzzer.log
 models/db.db
 wordlists/*
 ffuf_outputs/*
+*.exe
+*.zip
+*.log
+.gitignore

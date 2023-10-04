@@ -157,7 +157,9 @@ func indexPost(c *gin.Context) {
 	c.SaveUploadedFile(file, uploadedFilePath)
 
 	go addFuzz(url, uploadedFilePath, c.ClientIP())
-
+	// go routine'le calistirdigimiz icin addFuzz fonksiyonu db'ye ekleme yapmadan kullanıcıya fuzzları donuyor. guncel eklenen fuzz donmuyor
+	// bu yuzden 1 sn bekleyelim :) #TODO daha iyi bi cozum
+	time.Sleep(1 * time.Second)
 	fuzzs, err := models.GetFuzzs()
 	if err != nil {
 		fmt.Println(err)
@@ -214,13 +216,14 @@ func addFuzz(url string, wordlistFile string, ip string) {
 		return
 	}
 
-	out, err := exec.Command("ffuf", "-u", url, "-w", wordlistFile, "-p", "1-3", "-c").Output()
+	out, err := exec.Command("ffuf", "-u", url, "-w", wordlistFile, "-p", "1-3").Output()
 	if err != nil {
 		fuzz.Error = 1
 		models.UpdateFuzz(fuzz)
 		fmt.Println("go addFuzz: ", err)
 		return
 	}
+
 	outputFile := DIR_FFUFOUTPUTS + strconv.Itoa(fuzz.Id)
 	err = os.WriteFile(outputFile, out, 0644)
 	if err != nil {
